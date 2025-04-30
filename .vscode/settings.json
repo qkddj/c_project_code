@@ -1,0 +1,18 @@
+{
+  "cmake.generator": "MSYS Makefiles",
+  "cmake.buildDirectory": "${workspaceFolder}/build",
+  "cmake.configureSettings": {
+    "CMAKE_C_COMPILER": "C:/msys64/ucrt64/bin/gcc.exe",
+    "CMAKE_CXX_COMPILER": "C:/msys64/ucrt64/bin/g++.exe"
+  },
+  "files.associations": {
+    "API.C": "cpp",
+    "stdio.h": "c",
+    "string.h": "c",
+    "sdl_ttf.h": "c",
+    "typeinfo": "c",
+    "client_func.h": "c",
+    "thread": "c",
+    "text_encoding": "c"
+  }
+}
