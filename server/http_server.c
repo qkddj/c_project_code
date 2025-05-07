@@ -49,18 +49,20 @@ int main() {
         char *pw = strtok(NULL, ",");
 
         if (strcmp(stats, "0") == 0){
-            char *data = Search_user_data(id,pw);
+            char* data = Search_user_data(id,pw);
 
             if (data != NULL){
                 const char *response = data;
 
                 send(client_fd, response, (int)strlen(response), 0);
+                printf("반환 값:\n%s\n", buffer);
             }
             else{
                 const char *response =
                 "로그인 실패\n";
 
                 send(client_fd, response, (int)strlen(response), 0);
+                printf("반환 값:\n%s\n", buffer);
             }
 
             closesocket(client_fd);
