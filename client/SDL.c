@@ -7,6 +7,7 @@
 #define MAX_INPUT 20
 
 int main(int argc, char* argv[]) {
+
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
         printf("SDL 초기화 실패: %s\n", SDL_GetError());
         return 1;
@@ -48,11 +49,12 @@ int main(int argc, char* argv[]) {
                     else if (e.key.keysym.sym == SDLK_TAB) {
                         input_focus = (input_focus == 0) ? 1 : 0; // 탭 키로 포커스 전환
                     }
-                    else if (x >= 150 && x <= 320 && y >= 290 && y <= 330){
+                    else if (x >= 150 && x <= 320 && y >= 290 && y <= 330){ //회원가입
                         send_idpw('1',id_input,pw_input);
                     }
-                    else if ((x >= 330 && x <= 500 && y >= 290 && y <= 330) || (e.key.keysym.sym == SDLK_RETURN)) {
-                        send_idpw('0',id_input,pw_input);
+                    else if ((x >= 330 && x <= 500 && y >= 290 && y <= 330) || (e.key.keysym.sym == SDLK_RETURN)) { //로그인
+                        char* user_key = send_idpw('0',id_input,pw_input);
+                        printf("%s",user_key);
                 }
             }
 

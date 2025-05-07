@@ -10,23 +10,24 @@
 #define HOST "127.0.0.1"
 #define PORT 8080
 
-int send_idpw(char stats,char id[20],char pw[20]) {
+char* send_idpw(char stats,char id[20],char pw[20]) {
     WSADATA wsaData;
     SOCKET sockfd;
     struct sockaddr_in server_addr;
     char buffer[2048];
     int bytes_received;
+    static char user_key[50] = "0";
 
     if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) {
         printf("WSAStartup 실패\n");
-        return 1;
+        return "1";
     }
 
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if (sockfd == INVALID_SOCKET) {
         printf("소켓 생성 실패\n");
         WSACleanup();
-        return 1;
+        return "1";
     }
 
     server_addr.sin_family = AF_INET;
@@ -37,7 +38,7 @@ int send_idpw(char stats,char id[20],char pw[20]) {
         printf("서버 연결 실패\n");
         closesocket(sockfd);
         WSACleanup();
-        return 1;
+        return "1";
     }
 
     char http_get[1024];
@@ -57,11 +58,11 @@ int send_idpw(char stats,char id[20],char pw[20]) {
         bytes_received = recv(sockfd, buffer, sizeof(buffer) - 1, 0);
         if (bytes_received > 0) {
             buffer[bytes_received] = '\0';
-            printf("%s", buffer);
+            strcpy(user_key, buffer);
         }
     } while (bytes_received > 0);
 
     closesocket(sockfd);
     WSACleanup();
-    return 0;
+    return user_key;
 }
