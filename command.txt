@@ -3,7 +3,4 @@ gcc server.c csv_open.c -o server -lws2_32
 
 
 
-gcc SDL.c api.c encoding.c -o SDL -I"C:/msys64/mingw64/include/SDL2" -I"C:/msys64/mingw64/include" -Dmain=SDL_main -L"C:/msys64/mingw64/lib" -lmingw32 -lSDL2main -lSDL2 -lSDL2_ttf -lws2_32 -lssl -lcrypto   
-
-
-gcc main.c login_page.c api.c encoding.c -o SDL -I"C:/msys64/mingw64/include/SDL2" -I"C:/msys64/mingw64/include" -Dmain=SDL_main -L"C:/msys64/mingw64/lib" -lmingw32 -lSDL2main -lSDL2 -lSDL2_ttf -lws2_32 -lssl -lcrypto  
+gcc main.c login_page.c api.c encoding.c -o client -I"C:/msys64/mingw64/include/SDL2" -I"C:/msys64/mingw64/include" -Dmain=SDL_main -L"C:/msys64/mingw64/lib" -lmingw32 -lSDL2main -lSDL2 -lSDL2_ttf -lws2_32 -lssl -lcrypto  
