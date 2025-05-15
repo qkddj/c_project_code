@@ -1,8 +1,13 @@
-// client_func.h
-#ifndef MYFUNC_H
-#define MYFUNC_H
+#ifndef LOGIN_MODULE_H
+#define LOGIN_MODULE_H
 
-char* send_idpw(char stats,char id[20],char pw[20]);  // 함수 선언
+#include <SDL.h>
+
+// 화면 렌더링 함수
+void runLoginScreen(SDL_Window* window, SDL_Renderer* renderer);
+
+// 로그인/회원가입 서버 통신 함수
+char* send_idpw(char stats, const char* id, const char* pw);
 char* hash_password(const char *password);
 
 #endif

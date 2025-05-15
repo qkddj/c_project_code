@@ -55,14 +55,14 @@ int main() {
                 const char *response = data;
 
                 send(client_fd, response, (int)strlen(response), 0);
-                printf("반환 값:\n%s\n", buffer);
+                printf("반환 값:\n%s\n", response);
             }
             else{
                 const char *response =
                 "로그인 실패\n";
 
                 send(client_fd, response, (int)strlen(response), 0);
-                printf("반환 값:\n%s\n", buffer);
+                printf("반환 값:\n%s\n", response);
             }
 
             closesocket(client_fd);

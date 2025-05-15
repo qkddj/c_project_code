@@ -10,7 +10,7 @@
 #define HOST "127.0.0.1"
 #define PORT 8080
 
-char* send_idpw(char stats,char id[20],char pw[20]) {
+char* send_idpw(char stats, const char* id, const char* pw) {
     WSADATA wsaData;
     SOCKET sockfd;
     struct sockaddr_in server_addr;
