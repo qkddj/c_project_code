@@ -55,6 +55,10 @@ int main(int argc, char* argv[]) {
                 break;
             }
             case 6: {
+                page = 0;
+                break;
+            }
+            case 7: {
                 running = 0;
                 break;
             }

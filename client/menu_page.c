@@ -47,7 +47,7 @@ int runMainMenuScreen(SDL_Window* window, SDL_Renderer* renderer) {
         {{0}, "2. 식재료 추가/제거"},
         {{0}, "3. 레시피 검색"},
         {{0}, "4. 요리 추천"},
-        {{0}, "5. 종료"}
+        {{0}, "5. 로그아웃"}
     };
 
     int selectedMenu = -1;
@@ -57,7 +57,7 @@ int runMainMenuScreen(SDL_Window* window, SDL_Renderer* renderer) {
             switch (event.type) {
                 case SDL_QUIT:
                     running = 0;
-                    selectedMenu = 6;  // 종료
+                    selectedMenu = 7;  // 종료
                     break;
 
                 case SDL_MOUSEBUTTONDOWN:

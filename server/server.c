@@ -42,7 +42,7 @@ int main() {
         memset(buffer, 0, sizeof(buffer));
 
         recv(client_fd, buffer, sizeof(buffer) - 1, 0);
-        printf("클라이언트 요청:\n%s\n", buffer);
+        printf("클라이언트 요청: %s\n", buffer);
 
         char *stats = strtok(buffer, ",");
         char *id = strtok(NULL, ",");
@@ -55,14 +55,14 @@ int main() {
                 const char *response = data;
 
                 send(client_fd, response, (int)strlen(response), 0);
-                printf("반환 값:\n%s\n", response);
+                printf("반환 값: %s\n", response);
             }
             else{
                 const char *response =
                 "0";
 
                 send(client_fd, response, (int)strlen(response), 0);
-                printf("반환 값:\n%s\n", response);
+                printf("반환 값: %s\n", response);
             }
 
             closesocket(client_fd);
