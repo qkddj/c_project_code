@@ -59,7 +59,7 @@ int main() {
             }
             else{
                 const char *response =
-                "로그인 실패\n";
+                "0";
 
                 send(client_fd, response, (int)strlen(response), 0);
                 printf("반환 값:\n%s\n", response);

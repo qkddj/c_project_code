@@ -16,18 +16,19 @@ char* send_idpw(char stats, const char* id, const char* pw) {
     struct sockaddr_in server_addr;
     char buffer[2048];
     int bytes_received;
-    static char user_key[50] = "0";
+    static char user_key[50];
+    int got_response = 0;
 
     if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) {
         printf("WSAStartup 실패\n");
-        return "1";
+        return NULL;
     }
 
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if (sockfd == INVALID_SOCKET) {
         printf("소켓 생성 실패\n");
         WSACleanup();
-        return "1";
+        return NULL;
     }
 
     server_addr.sin_family = AF_INET;
@@ -38,7 +39,7 @@ char* send_idpw(char stats, const char* id, const char* pw) {
         printf("서버 연결 실패\n");
         closesocket(sockfd);
         WSACleanup();
-        return "1";
+        return NULL;
     }
 
     char http_get[1024];

@@ -5,11 +5,11 @@
 
 #define MAX_INPUT 20
 
-void runLoginScreen(SDL_Window* window, SDL_Renderer* renderer) {
+char* runLoginScreen(SDL_Window* window, SDL_Renderer* renderer) {
     TTF_Font* font = TTF_OpenFont("NanumGothic.ttf", 24);
     if (!font) {
         printf("폰트 로딩 실패: %s\n", TTF_GetError());
-        return;
+        return NULL;
     }
 
     char id_input[MAX_INPUT] = "";
@@ -32,7 +32,12 @@ void runLoginScreen(SDL_Window* window, SDL_Renderer* renderer) {
                 else if (x >= 150 && x <= 320 && y >= 290 && y <= 330) send_idpw('1', id_input, pw_input);
                 else if ((x >= 330 && x <= 500 && y >= 290 && y <= 330) || e.key.keysym.sym == SDLK_RETURN) {
                     char* user_key = send_idpw('0', id_input, pw_input);
-                    printf("%s\n", user_key);
+                    if (strcmp(user_key, "0") != 0) {
+                        printf("로그인 성공: %s\n", user_key);
+                        return user_key;
+                    } else {
+                        printf("로그인 실패: %s\n", user_key);
+                    }
                 }
             }
 
