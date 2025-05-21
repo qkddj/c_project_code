@@ -7,6 +7,8 @@ int main(int argc, char* argv[]) {
     int page = 0;
     int running = 1;
 
+    char* user_key = NULL;
+
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
         printf("SDL 초기화 실패: %s\n", SDL_GetError());
         return 1;
@@ -39,7 +41,7 @@ int main(int argc, char* argv[]) {
         switch(page){
             case 0: {
                 // 로그인 화면
-                char* user_key = runLoginScreen(window, renderer);
+                user_key = runLoginScreen(window, renderer);
 
                 if (strcmp(user_key, "0") != 0) {
                     page = 1;
@@ -52,6 +54,11 @@ int main(int argc, char* argv[]) {
             case 1: {
                 // 메뉴 화면
                 page = runMainMenuScreen(window, renderer);
+                break;
+            }
+            case 2: {
+                // 식재료 보기 화면
+                page = runIngredientScreen(window, renderer, user_key);
                 break;
             }
             case 6: {

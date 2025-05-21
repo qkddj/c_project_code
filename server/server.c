@@ -45,11 +45,11 @@ int main() {
         printf("클라이언트 요청: %s\n", buffer);
 
         char *stats = strtok(buffer, ",");
-        char *id = strtok(NULL, ",");
-        char *pw = strtok(NULL, ",");
 
         if (strcmp(stats, "0") == 0){
-            char* data = Search_user_data(id,pw);
+            char *id = strtok(NULL, ",");
+            char *pw = strtok(NULL, ",");
+            char* data = Search_user_key(id,pw);
 
             if (data != NULL){
                 const char *response = data;
@@ -69,7 +69,9 @@ int main() {
         }
         
         else if (strcmp(stats, "1") == 0){
-            if (Save_user_data(id,pw) == 1){
+            char *id = strtok(NULL, ",");
+            char *pw = strtok(NULL, ",");
+            if (Save_user_key(id,pw) == 1){
                 const char *response = "회원가입 성공\n";
                 send(client_fd, response, (int)strlen(response), 0);
             }
@@ -78,6 +80,21 @@ int main() {
                 send(client_fd, response, (int)strlen(response), 0);
             }
 
+            closesocket(client_fd);
+        }
+
+        else if (strcmp(stats, "2") == 0){
+            char *user_key = strtok(NULL, ",");
+
+            char filename[64];
+            sprintf(filename, "%s_ingredients.csv", user_key);
+
+            printf("파일 이름: %s\n", filename);
+
+            const char *response = load_ingredients_as_text(filename);
+                send(client_fd, response, (int)strlen(response), 0);
+            
+            printf("반환 값: %s\n", response);
             closesocket(client_fd);
         }
     }
