@@ -61,6 +61,11 @@ int main(int argc, char* argv[]) {
                 page = runIngredientScreen(window, renderer, user_key);
                 break;
             }
+            case 3: {
+                // 식재료 추가/제거 화면
+                page = add_Remove_Ingredients(window, renderer, user_key);
+                break;
+            }
             case 6: {
                 page = 0;
                 break;

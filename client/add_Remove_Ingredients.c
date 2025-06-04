@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include "client_func.h"
 
-int runIngredientScreen(SDL_Window* window, SDL_Renderer* renderer, const char* user_key) {
+int add_Remove_Ingredients(SDL_Window* window, SDL_Renderer* renderer, const char* user_key) {
     int rawCount = 0;
     char** ingredients_raw = get_Ingredients_split('2', user_key, &rawCount);
 

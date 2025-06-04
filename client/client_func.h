@@ -16,5 +16,6 @@ void renderText(SDL_Renderer* renderer, TTF_Font* font, const char* text, int x,
 int isInside(int x, int y, SDL_Rect rect);
 char** sum_ingredients(const char* raw[], int rawCount, int* outCount);
 char** get_Ingredients_split(char stats, const char* user_key, int* outCount);
+int add_Remove_Ingredients(SDL_Window* window, SDL_Renderer* renderer, const char* user_key);
 
 #endif
