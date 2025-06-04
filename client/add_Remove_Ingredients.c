@@ -20,7 +20,10 @@ int add_Remove_Ingredients(SDL_Window* window, SDL_Renderer* renderer, const cha
     char selectedName[32] = "";
 
     int inputActive = 0;
-    SDL_Rect inputBoxRect = {170, 390, 300, 40};  // y값을 위로 이동
+    SDL_Rect inputBoxRect = {170, 390, 300, 40};
+
+    char inputBuffer[64] = "";
+    int inputLength = 0;
 
     TTF_Font* font = TTF_OpenFont("NanumGothic.ttf", 28);
     if (!font) {
@@ -36,12 +39,14 @@ int add_Remove_Ingredients(SDL_Window* window, SDL_Renderer* renderer, const cha
     SDL_Rect itemRects[itemsPerPage];
     SDL_Rect backButtonRect;
 
+    SDL_StartTextInput();
+
     while (running) {
         while (SDL_PollEvent(&event)) {
             switch (event.type) {
                 case SDL_QUIT:
                     running = 0;
-                    return 7;
+                    break;
 
                 case SDL_KEYDOWN:
                     if (event.key.keysym.sym == SDLK_ESCAPE) {
@@ -52,6 +57,19 @@ int add_Remove_Ingredients(SDL_Window* window, SDL_Renderer* renderer, const cha
                         scrollOffset++;
                     } else if (event.key.keysym.sym == SDLK_UP && scrollOffset > 0) {
                         scrollOffset--;
+                    } else if (inputActive && event.key.keysym.sym == SDLK_BACKSPACE) {
+                        if (inputLength > 0) {
+                            inputBuffer[--inputLength] = '\0';
+                            printf("입력됨: %s\n", inputBuffer);
+                        }
+                    }
+                    break;
+
+                case SDL_TEXTINPUT:
+                    if (inputActive && inputLength + strlen(event.text.text) < sizeof(inputBuffer) - 1) {
+                        strcat(inputBuffer, event.text.text);
+                        inputLength += strlen(event.text.text);
+                        printf("입력됨: %s\n", inputBuffer);
                     }
                     break;
 
@@ -71,11 +89,10 @@ int add_Remove_Ingredients(SDL_Window* window, SDL_Renderer* renderer, const cha
                                 scrollOffset = 0;
                             } else {
                                 running = 0;
-                                return 1;
+                                break;
                             }
                         }
 
-                        // 입력창 클릭 여부 확인
                         if (mx >= inputBoxRect.x && mx <= inputBoxRect.x + inputBoxRect.w &&
                             my >= inputBoxRect.y && my <= inputBoxRect.y + inputBoxRect.h) {
                             inputActive = 1;
@@ -136,17 +153,18 @@ int add_Remove_Ingredients(SDL_Window* window, SDL_Renderer* renderer, const cha
         else
             renderText(renderer, font, "← 메뉴로", 480, 20, &backButtonRect);
 
-        // 입력창 사각형 렌더링 (선택되면 하이라이트 색)
+        // 입력창 사각형 렌더링
         if (inputActive) {
-            SDL_SetRenderDrawColor(renderer, 0, 200, 255, 255);  // 하이라이트 색
+            SDL_SetRenderDrawColor(renderer, 0, 200, 255, 255);
         } else {
-            SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);  // 기본 색
+            SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
         }
         SDL_RenderDrawRect(renderer, &inputBoxRect);
 
         SDL_RenderPresent(renderer);
     }
 
+    SDL_StopTextInput();
     TTF_CloseFont(font);
     for (int i = 0; i < mergedCount; i++) free(ingredients[i]);
     free(ingredients);
