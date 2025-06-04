@@ -23,11 +23,11 @@ int add_Remove_Ingredients(SDL_Window* window, SDL_Renderer* renderer, const cha
     char inputBuffer[64] = "";
     int inputLength = 0;
 
-    int showWarning = 0;  // 경고 창 표시 여부
+    int showWarning = 0;
 
     TTF_Font* font = TTF_OpenFont("NanumGothic.ttf", 28);
     if (!font) {
-        printf("폰트 로딩 실패: %s\n", TTF_GetError());
+        printf("\n폰트 로딩 실패: %s\n", TTF_GetError());
         for (int i = 0; i < mergedCount; i++) free(ingredients[i]);
         free(ingredients);
         return 10;
@@ -61,13 +61,18 @@ int add_Remove_Ingredients(SDL_Window* window, SDL_Renderer* renderer, const cha
                         if (inputActive) {
                             printf("입력 확정: %s\n", inputBuffer);
                             char name[32], date[32];
-                            int qty;
+                            int y, m, d, qty;
 
-                            if (sscanf(inputBuffer, "%31[^/]/%31[^/]/%d", name, date, &qty) == 3) {
-                                printf("➕ 추가 요청: %s / %s / %d개\n", name, date, qty);
-                                // add_ingredient_api(user_key, name, date, qty);
+                            if (sscanf(inputBuffer, "%31[^/]/%d.%d.%d/%d", name, &y, &m, &d, &qty) == 5) {
+                                if (y >= 2000 && m >= 1 && m <= 12 && d >= 1 && d <= 31) {
+                                    snprintf(date, sizeof(date), "%04d.%02d.%02d", y, m, d);
+                                    printf("\u2795 추가 요청: %s / %s / %d개\n", name, date, qty);
+                                    // add_ingredient_api(user_key, name, date, qty);
+                                } else {
+                                    showWarning = 1;
+                                }
                             } else if (sscanf(inputBuffer, "%31[^/]/%d", name, &qty) == 2) {
-                                printf("➖ 삭제 요청: %s / %d개\n", name, qty);
+                                printf("\u2796 삭제 요청: %s / %d개\n", name, qty);
                                 // delete_ingredient_api(user_key, name, qty);
                             } else {
                                 showWarning = 1;
@@ -160,8 +165,7 @@ int add_Remove_Ingredients(SDL_Window* window, SDL_Renderer* renderer, const cha
                     if (count >= scrollOffset && count < scrollOffset + itemsPerPage) {
                         char displayLine[100];
                         sprintf(displayLine, "%s/%s/%d개", name, date, qty);
-                        renderText(renderer, font, displayLine, 175,
-                                   startY + (count - scrollOffset) * 50, &itemRects[count - scrollOffset]);
+                        renderText(renderer, font, displayLine, 175, startY + (count - scrollOffset) * 50, &itemRects[count - scrollOffset]);
                     }
                     count++;
                 }
@@ -169,15 +173,14 @@ int add_Remove_Ingredients(SDL_Window* window, SDL_Renderer* renderer, const cha
         }
 
         renderText(renderer, font, showingDetail ? "← 목록으로" : "← 메뉴로", 480, 20, &backButtonRect);
+        renderText(renderer, font, "이름/유통기한/개수 or 이름/개수", inputBoxRect.x - 45, inputBoxRect.y - 40, NULL);
 
-        // 입력창
         SDL_SetRenderDrawColor(renderer, inputActive ? 0 : 255, inputActive ? 200 : 255, inputActive ? 255 : 255, 255);
         SDL_RenderDrawRect(renderer, &inputBoxRect);
         if (inputBuffer[0]) {
             renderText(renderer, font, inputBuffer, inputBoxRect.x + 5, inputBoxRect.y + 5, NULL);
         }
 
-        // 경고창
         if (showWarning) {
             SDL_Rect warningBox = {150, 200, 340, 100};
             SDL_SetRenderDrawColor(renderer, 255, 80, 80, 255);
