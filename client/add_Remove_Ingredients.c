@@ -139,7 +139,6 @@ int add_Remove_Ingredients(SDL_Window* window, SDL_Renderer* renderer, const cha
                     if (count >= scrollOffset && count < scrollOffset + itemsPerPage) {
                         char displayLine[100];
                         sprintf(displayLine, "%s/%s/%d개", name, date, qty);
-
                         renderText(renderer, font, displayLine, 175,
                                    startY + (count - scrollOffset) * 50, &itemRects[count - scrollOffset]);
                     }
@@ -160,6 +159,11 @@ int add_Remove_Ingredients(SDL_Window* window, SDL_Renderer* renderer, const cha
             SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
         }
         SDL_RenderDrawRect(renderer, &inputBoxRect);
+
+        // 입력된 텍스트 화면에 출력
+        if (inputBuffer[0] != '\0') {
+            renderText(renderer, font, inputBuffer, inputBoxRect.x + 5, inputBoxRect.y + 5, NULL);
+        }
 
         SDL_RenderPresent(renderer);
     }

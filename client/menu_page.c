@@ -11,16 +11,31 @@ int isInside(int x, int y, SDL_Rect rect) {
 
 // 텍스트 렌더링 및 위치 정보 저장
 void renderText(SDL_Renderer* renderer, TTF_Font* font, const char* text, int x, int y, SDL_Rect* outRect) {
+    if (!renderer || !font || !text || text[0] == '\0') return;
+
     SDL_Color color = {255, 255, 255, 255};
     SDL_Surface* surface = TTF_RenderUTF8_Solid(font, text, color);
+    if (!surface) {
+        printf("텍스트 surface 생성 실패: %s\n", TTF_GetError());
+        return;
+    }
+
     SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
+    if (!texture) {
+        printf("텍스처 생성 실패\n");
+        SDL_FreeSurface(surface);
+        return;
+    }
 
-    outRect->x = x;
-    outRect->y = y;
-    outRect->w = surface->w;
-    outRect->h = surface->h;
+    if (outRect) {
+        outRect->x = x;
+        outRect->y = y;
+        outRect->w = surface->w;
+        outRect->h = surface->h;
+    }
 
-    SDL_RenderCopy(renderer, texture, NULL, outRect);
+    SDL_Rect dstRect = {x, y, surface->w, surface->h};
+    SDL_RenderCopy(renderer, texture, NULL, &dstRect);
 
     SDL_FreeSurface(surface);
     SDL_DestroyTexture(texture);
