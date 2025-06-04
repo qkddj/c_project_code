@@ -62,6 +62,24 @@ int add_Remove_Ingredients(SDL_Window* window, SDL_Renderer* renderer, const cha
                             inputBuffer[--inputLength] = '\0';
                             printf("입력됨: %s\n", inputBuffer);
                         }
+                    } else if (inputActive && event.key.keysym.sym == SDLK_RETURN) {
+                        printf("입력 확정: %s\n", inputBuffer);
+
+                        char name[32], date[32];
+                        int qty;
+
+                        if (sscanf(inputBuffer, "%31[^/]/%31[^/]/%d", name, date, &qty) == 3) {
+                            printf("➕ 추가 요청: %s / %s / %d개\n", name, date, qty);
+                            // add_ingredient_api(user_key, name, date, qty);
+                        } else if (sscanf(inputBuffer, "%31[^/]/%d", name, &qty) == 2) {
+                            printf("➖ 삭제 요청: %s / %d개\n", name, qty);
+                            // delete_ingredient_api(user_key, name, qty);
+                        } else {
+                            printf("⚠️ 잘못된 형식입니다: 이름/유통기한/개수 또는 이름/개수\n");
+                        }
+
+                        inputBuffer[0] = '\0';
+                        inputLength = 0;
                     }
                     break;
 
@@ -152,15 +170,13 @@ int add_Remove_Ingredients(SDL_Window* window, SDL_Renderer* renderer, const cha
         else
             renderText(renderer, font, "← 메뉴로", 480, 20, &backButtonRect);
 
-        // 입력창 사각형 렌더링
-        if (inputActive) {
+        // 입력창 사각형
+        if (inputActive)
             SDL_SetRenderDrawColor(renderer, 0, 200, 255, 255);
-        } else {
+        else
             SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-        }
         SDL_RenderDrawRect(renderer, &inputBoxRect);
 
-        // 입력된 텍스트 화면에 출력
         if (inputBuffer[0] != '\0') {
             renderText(renderer, font, inputBuffer, inputBoxRect.x + 5, inputBoxRect.y + 5, NULL);
         }
