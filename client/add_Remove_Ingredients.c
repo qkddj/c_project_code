@@ -14,10 +14,13 @@ int add_Remove_Ingredients(SDL_Window* window, SDL_Renderer* renderer, const cha
     int ingredientCount = mergedCount;
 
     int scrollOffset = 0;
-    const int itemsPerPage = 7;
+    const int itemsPerPage = 5;
 
     int showingDetail = 0;
     char selectedName[32] = "";
+
+    int inputActive = 0;
+    SDL_Rect inputBoxRect = {170, 390, 300, 40};  // y값을 위로 이동
 
     TTF_Font* font = TTF_OpenFont("NanumGothic.ttf", 28);
     if (!font) {
@@ -44,6 +47,7 @@ int add_Remove_Ingredients(SDL_Window* window, SDL_Renderer* renderer, const cha
                     if (event.key.keysym.sym == SDLK_ESCAPE) {
                         showingDetail = 0;
                         scrollOffset = 0;
+                        inputActive = 0;
                     } else if (event.key.keysym.sym == SDLK_DOWN) {
                         scrollOffset++;
                     } else if (event.key.keysym.sym == SDLK_UP && scrollOffset > 0) {
@@ -69,6 +73,14 @@ int add_Remove_Ingredients(SDL_Window* window, SDL_Renderer* renderer, const cha
                                 running = 0;
                                 return 1;
                             }
+                        }
+
+                        // 입력창 클릭 여부 확인
+                        if (mx >= inputBoxRect.x && mx <= inputBoxRect.x + inputBoxRect.w &&
+                            my >= inputBoxRect.y && my <= inputBoxRect.y + inputBoxRect.h) {
+                            inputActive = 1;
+                        } else {
+                            inputActive = 0;
                         }
 
                         if (!showingDetail) {
@@ -123,6 +135,14 @@ int add_Remove_Ingredients(SDL_Window* window, SDL_Renderer* renderer, const cha
             renderText(renderer, font, "← 목록으로", 480, 20, &backButtonRect);
         else
             renderText(renderer, font, "← 메뉴로", 480, 20, &backButtonRect);
+
+        // 입력창 사각형 렌더링 (선택되면 하이라이트 색)
+        if (inputActive) {
+            SDL_SetRenderDrawColor(renderer, 0, 200, 255, 255);  // 하이라이트 색
+        } else {
+            SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);  // 기본 색
+        }
+        SDL_RenderDrawRect(renderer, &inputBoxRect);
 
         SDL_RenderPresent(renderer);
     }
