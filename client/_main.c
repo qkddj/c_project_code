@@ -66,6 +66,11 @@ int main(int argc, char* argv[]) {
                 page = add_Remove_Ingredients(window, renderer, user_key);
                 break;
             }
+            case 4: {
+                // 레시피 검색 화면
+                page = search_recipe_page(window, renderer);
+                break;
+            }
             case 6: {
                 page = 0;
                 break;
