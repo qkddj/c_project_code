@@ -8,7 +8,6 @@
 int add_Remove_Ingredients(SDL_Window* window, SDL_Renderer* renderer, const char* user_key) {
     int rawCount = 0;
     char** ingredients_raw = get_Ingredients_split('2', user_key, &rawCount);
-
     int mergedCount = 0;
     char** ingredients = sum_ingredients((const char**)ingredients_raw, rawCount, &mergedCount);
     int ingredientCount = mergedCount;
@@ -21,9 +20,10 @@ int add_Remove_Ingredients(SDL_Window* window, SDL_Renderer* renderer, const cha
 
     int inputActive = 0;
     SDL_Rect inputBoxRect = {170, 390, 300, 40};
-
     char inputBuffer[64] = "";
     int inputLength = 0;
+
+    int showWarning = 0;  // 경고 창 표시 여부
 
     TTF_Font* font = TTF_OpenFont("NanumGothic.ttf", 28);
     if (!font) {
@@ -35,9 +35,7 @@ int add_Remove_Ingredients(SDL_Window* window, SDL_Renderer* renderer, const cha
 
     SDL_Event event;
     int running = 1;
-
-    SDL_Rect itemRects[itemsPerPage];
-    SDL_Rect backButtonRect;
+    SDL_Rect itemRects[itemsPerPage], backButtonRect;
 
     SDL_StartTextInput();
 
@@ -46,40 +44,47 @@ int add_Remove_Ingredients(SDL_Window* window, SDL_Renderer* renderer, const cha
             switch (event.type) {
                 case SDL_QUIT:
                     running = 0;
-                    break;
+                    return 7;
 
                 case SDL_KEYDOWN:
                     if (event.key.keysym.sym == SDLK_ESCAPE) {
                         showingDetail = 0;
                         scrollOffset = 0;
                         inputActive = 0;
-                    } else if (event.key.keysym.sym == SDLK_DOWN) {
-                        scrollOffset++;
-                    } else if (event.key.keysym.sym == SDLK_UP && scrollOffset > 0) {
-                        scrollOffset--;
+                        showWarning = 0;
+                    } else if (event.key.keysym.sym == SDLK_RETURN) {
+                        if (showWarning) {
+                            showWarning = 0;
+                            break;
+                        }
+
+                        if (inputActive) {
+                            printf("입력 확정: %s\n", inputBuffer);
+                            char name[32], date[32];
+                            int qty;
+
+                            if (sscanf(inputBuffer, "%31[^/]/%31[^/]/%d", name, date, &qty) == 3) {
+                                printf("➕ 추가 요청: %s / %s / %d개\n", name, date, qty);
+                                // add_ingredient_api(user_key, name, date, qty);
+                            } else if (sscanf(inputBuffer, "%31[^/]/%d", name, &qty) == 2) {
+                                printf("➖ 삭제 요청: %s / %d개\n", name, qty);
+                                // delete_ingredient_api(user_key, name, qty);
+                            } else {
+                                showWarning = 1;
+                            }
+
+                            inputBuffer[0] = '\0';
+                            inputLength = 0;
+                        }
                     } else if (inputActive && event.key.keysym.sym == SDLK_BACKSPACE) {
                         if (inputLength > 0) {
                             inputBuffer[--inputLength] = '\0';
                             printf("입력됨: %s\n", inputBuffer);
                         }
-                    } else if (inputActive && event.key.keysym.sym == SDLK_RETURN) {
-                        printf("입력 확정: %s\n", inputBuffer);
-
-                        char name[32], date[32];
-                        int qty;
-
-                        if (sscanf(inputBuffer, "%31[^/]/%31[^/]/%d", name, date, &qty) == 3) {
-                            printf("➕ 추가 요청: %s / %s / %d개\n", name, date, qty);
-                            // add_ingredient_api(user_key, name, date, qty);
-                        } else if (sscanf(inputBuffer, "%31[^/]/%d", name, &qty) == 2) {
-                            printf("➖ 삭제 요청: %s / %d개\n", name, qty);
-                            // delete_ingredient_api(user_key, name, qty);
-                        } else {
-                            printf("⚠️ 잘못된 형식입니다: 이름/유통기한/개수 또는 이름/개수\n");
-                        }
-
-                        inputBuffer[0] = '\0';
-                        inputLength = 0;
+                    } else if (event.key.keysym.sym == SDLK_DOWN) {
+                        scrollOffset++;
+                    } else if (event.key.keysym.sym == SDLK_UP && scrollOffset > 0) {
+                        scrollOffset--;
                     }
                     break;
 
@@ -107,12 +112,10 @@ int add_Remove_Ingredients(SDL_Window* window, SDL_Renderer* renderer, const cha
                                 scrollOffset = 0;
                             } else {
                                 running = 0;
-                                break;
                             }
                         }
 
-                        if (mx >= inputBoxRect.x && mx <= inputBoxRect.x + inputBoxRect.w &&
-                            my >= inputBoxRect.y && my <= inputBoxRect.y + inputBoxRect.h) {
+                        if (isInside(mx, my, inputBoxRect)) {
                             inputActive = 1;
                         } else {
                             inputActive = 0;
@@ -165,20 +168,24 @@ int add_Remove_Ingredients(SDL_Window* window, SDL_Renderer* renderer, const cha
             }
         }
 
-        if (showingDetail)
-            renderText(renderer, font, "← 목록으로", 480, 20, &backButtonRect);
-        else
-            renderText(renderer, font, "← 메뉴로", 480, 20, &backButtonRect);
+        renderText(renderer, font, showingDetail ? "← 목록으로" : "← 메뉴로", 480, 20, &backButtonRect);
 
-        // 입력창 사각형
-        if (inputActive)
-            SDL_SetRenderDrawColor(renderer, 0, 200, 255, 255);
-        else
-            SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+        // 입력창
+        SDL_SetRenderDrawColor(renderer, inputActive ? 0 : 255, inputActive ? 200 : 255, inputActive ? 255 : 255, 255);
         SDL_RenderDrawRect(renderer, &inputBoxRect);
-
-        if (inputBuffer[0] != '\0') {
+        if (inputBuffer[0]) {
             renderText(renderer, font, inputBuffer, inputBoxRect.x + 5, inputBoxRect.y + 5, NULL);
+        }
+
+        // 경고창
+        if (showWarning) {
+            SDL_Rect warningBox = {150, 200, 340, 100};
+            SDL_SetRenderDrawColor(renderer, 255, 80, 80, 255);
+            SDL_RenderFillRect(renderer, &warningBox);
+            SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+            SDL_RenderDrawRect(renderer, &warningBox);
+            renderText(renderer, font, "올바른 형식이 아닙니다!", warningBox.x + 25, warningBox.y + 20, NULL);
+            renderText(renderer, font, "Enter를 눌러 닫기", warningBox.x + 65, warningBox.y + 50, NULL);
         }
 
         SDL_RenderPresent(renderer);
@@ -188,5 +195,5 @@ int add_Remove_Ingredients(SDL_Window* window, SDL_Renderer* renderer, const cha
     TTF_CloseFont(font);
     for (int i = 0; i < mergedCount; i++) free(ingredients[i]);
     free(ingredients);
-    return 7;
+    return 1;
 }
