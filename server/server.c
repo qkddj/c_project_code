@@ -97,6 +97,46 @@ int main() {
             printf("반환 값: %s\n", response);
             closesocket(client_fd);
         }
+
+        else if (strcmp(stats, "3") == 0) {
+            char* user_key = strtok(NULL, ",");
+            char* name = strtok(NULL, ",");
+            char* date = strtok(NULL, ",");
+            char* qty_str = strtok(NULL, ",");
+            int qty = atoi(qty_str);
+
+            char filename[64];
+            sprintf(filename, "%s_ingredients.csv", user_key);
+
+            int result = save_ingredient_to_file(filename, name, date, qty);
+
+            if (result == 1) {
+                const char* response = "추가 성공\n";
+                send(client_fd, response, (int)strlen(response), 0);
+            } else {
+                const char* response = "추가 실패\n";
+                send(client_fd, response, (int)strlen(response), 0);
+            }
+
+            closesocket(client_fd);
+        }
+        else if (strcmp(stats, "4") == 0) {
+            char *user_key = strtok(NULL, ",");
+            char *name = strtok(NULL, ",");
+            int qty = atoi(strtok(NULL, ","));
+
+            char filename[64];
+            sprintf(filename, "%s_ingredients.csv", user_key);
+
+            if (delete_ingredient_from_file(filename, name, qty)) {
+                const char* response = "삭제 성공\n";
+                send(client_fd, response, (int)strlen(response), 0);
+            } else {
+                const char* response = "삭제 실패\n";
+                send(client_fd, response, (int)strlen(response), 0);
+            }
+            closesocket(client_fd);
+        }
     }
 
     closesocket(server_fd);

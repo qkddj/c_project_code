@@ -144,4 +144,88 @@ char** get_Ingredients_split(char stats, const char* user_key, int* outCount) {
     return lines;
 }
 
+void add_ingredient_api(const char* user_key, const char* name, const char* date, int qty) {
+    WSADATA wsaData;
+    SOCKET sockfd;
+    struct sockaddr_in server_addr;
+    char send_data[256], recv_buffer[128];
+    int bytes_received;
 
+    if (WSAStartup(MAKEWORD(2,2), &wsaData) != 0) {
+        printf("WSAStartup 실패\n");
+        return;
+    }
+
+    sockfd = socket(AF_INET, SOCK_STREAM, 0);
+    if (sockfd == INVALID_SOCKET) {
+        printf("소켓 생성 실패\n");
+        WSACleanup();
+        return;
+    }
+
+    server_addr.sin_family = AF_INET;
+    server_addr.sin_port = htons(PORT);
+    inet_pton(AF_INET, HOST, &server_addr.sin_addr);
+
+    if (connect(sockfd, (struct sockaddr*)&server_addr, sizeof(server_addr)) < 0) {
+        printf("서버 연결 실패\n");
+        closesocket(sockfd);
+        WSACleanup();
+        return;
+    }
+
+    snprintf(send_data, sizeof(send_data), "3,%s,%s,%s,%d", user_key, name, date, qty);
+    send(sockfd, send_data, strlen(send_data), 0);
+
+    bytes_received = recv(sockfd, recv_buffer, sizeof(recv_buffer) - 1, 0);
+    if (bytes_received > 0) {
+        recv_buffer[bytes_received] = '\0';
+        printf("서버 응답: %s\n", recv_buffer);
+    }
+
+    closesocket(sockfd);
+    WSACleanup();
+}
+
+void delete_ingredient_api(const char* user_key, const char* name, int qty) {
+    WSADATA wsaData;
+    SOCKET sockfd;
+    struct sockaddr_in server_addr;
+    char send_data[256], recv_buffer[128];
+    int bytes_received;
+
+    if (WSAStartup(MAKEWORD(2,2), &wsaData) != 0) {
+        printf("WSAStartup 실패\n");
+        return;
+    }
+
+    sockfd = socket(AF_INET, SOCK_STREAM, 0);
+    if (sockfd == INVALID_SOCKET) {
+        printf("소켓 생성 실패\n");
+        WSACleanup();
+        return;
+    }
+
+    server_addr.sin_family = AF_INET;
+    server_addr.sin_port = htons(PORT);
+    inet_pton(AF_INET, HOST, &server_addr.sin_addr);
+
+    if (connect(sockfd, (struct sockaddr*)&server_addr, sizeof(server_addr)) < 0) {
+        printf("서버 연결 실패\n");
+        closesocket(sockfd);
+        WSACleanup();
+        return;
+    }
+
+    snprintf(send_data, sizeof(send_data), "4,%s,%s,%d", user_key, name, qty);
+    send(sockfd, send_data, strlen(send_data), 0);
+
+    bytes_received = recv(sockfd, recv_buffer, sizeof(recv_buffer) - 1, 0);
+    if (bytes_received > 0) {
+        recv_buffer[bytes_received] = '\0';
+        printf("서버 응답: %s\n", recv_buffer);
+    }
+
+    closesocket(sockfd);
+    WSACleanup();
+}

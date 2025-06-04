@@ -108,3 +108,103 @@ char* load_ingredients_as_text(const char* filename) {
     return result;  // 호출자가 free() 해야 함
 }
 
+int compare_ingredients(const void* a, const void* b) {
+    const Ingredient* i1 = (const Ingredient*)a;
+    const Ingredient* i2 = (const Ingredient*)b;
+
+    int cmp = strcmp(i1->name, i2->name);
+    if (cmp != 0) return cmp;
+    return strcmp(i1->date, i2->date);
+}
+
+int save_ingredient_to_file(const char* filename, const char* name, const char* date, int qty) {
+    Ingredient list[100];
+    int count = 0;
+
+    // 1. 기존 파일 읽기
+    FILE* fp = fopen(filename, "r");
+    if (fp) {
+        while (fscanf(fp, "%63[^,],%31[^,],%d\n", list[count].name, list[count].date, &list[count].qty) == 3) {
+            count++;
+        }
+        fclose(fp);
+    }
+
+    // 2. 이미 있는 항목이면 수량 누적
+    int found = 0;
+    for (int i = 0; i < count; i++) {
+        if (strcmp(list[i].name, name) == 0 && strcmp(list[i].date, date) == 0) {
+            list[i].qty += qty;
+            found = 1;
+            break;
+        }
+    }
+
+    // 3. 새 항목이면 추가
+    if (!found) {
+        strncpy(list[count].name, name, sizeof(list[count].name));
+        strncpy(list[count].date, date, sizeof(list[count].date));
+        list[count].qty = qty;
+        count++;
+    }
+
+    // 4. 이름 → 유통기한 기준 정렬
+    qsort(list, count, sizeof(Ingredient), compare_ingredients);
+
+    // 5. 다시 파일에 저장
+    fp = fopen(filename, "w");
+    if (!fp) return 0;
+
+    for (int i = 0; i < count; i++) {
+        fprintf(fp, "%s,%s,%d\n", list[i].name, list[i].date, list[i].qty);
+    }
+
+    fclose(fp);
+    return 1;
+}
+
+int delete_ingredient_from_file(const char* filename, const char* name, int qty_to_remove) {
+    Ingredient list[100];
+    int count = 0;
+
+    FILE* fp = fopen(filename, "r");
+    if (!fp) return 0;
+
+    while (fscanf(fp, "%63[^,],%31[^,],%d\n", list[count].name, list[count].date, &list[count].qty) == 3) {
+        count++;
+    }
+    fclose(fp);
+
+    qsort(list, count, sizeof(Ingredient), compare_ingredients);
+
+    // 수량 차감
+    for (int i = 0; i < count && qty_to_remove > 0; i++) {
+        if (strcmp(list[i].name, name) == 0) {
+            if (list[i].qty > qty_to_remove) {
+                list[i].qty -= qty_to_remove;
+                qty_to_remove = 0;
+            } else {
+                qty_to_remove -= list[i].qty;
+                list[i].qty = 0;
+            }
+        }
+    }
+
+    // 0개 된 항목 제거
+    Ingredient newList[100];
+    int newCount = 0;
+    for (int i = 0; i < count; i++) {
+        if (list[i].qty > 0) {
+            newList[newCount++] = list[i];
+        }
+    }
+
+    // 파일 덮어쓰기
+    fp = fopen(filename, "w");
+    if (!fp) return 0;
+    for (int i = 0; i < newCount; i++) {
+        fprintf(fp, "%s,%s,%d\n", newList[i].name, newList[i].date, newList[i].qty);
+    }
+    fclose(fp);
+    return 1;
+}

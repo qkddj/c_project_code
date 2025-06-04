@@ -17,5 +17,7 @@ int isInside(int x, int y, SDL_Rect rect);
 char** sum_ingredients(const char* raw[], int rawCount, int* outCount);
 char** get_Ingredients_split(char stats, const char* user_key, int* outCount);
 int add_Remove_Ingredients(SDL_Window* window, SDL_Renderer* renderer, const char* user_key);
+void add_ingredient_api(const char* user_key, const char* name, const char* date, int qty);
+void delete_ingredient_api(const char* user_key, const char* name, int qty);
 
 #endif

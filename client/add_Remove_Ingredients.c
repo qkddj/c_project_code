@@ -67,13 +67,13 @@ int add_Remove_Ingredients(SDL_Window* window, SDL_Renderer* renderer, const cha
                                 if (y >= 2000 && m >= 1 && m <= 12 && d >= 1 && d <= 31) {
                                     snprintf(date, sizeof(date), "%04d.%02d.%02d", y, m, d);
                                     printf("\u2795 추가 요청: %s / %s / %d개\n", name, date, qty);
-                                    // add_ingredient_api(user_key, name, date, qty);
+                                    add_ingredient_api(user_key, name, date, qty);
                                 } else {
                                     showWarning = 1;
                                 }
                             } else if (sscanf(inputBuffer, "%31[^/]/%d", name, &qty) == 2) {
                                 printf("\u2796 삭제 요청: %s / %d개\n", name, qty);
-                                // delete_ingredient_api(user_key, name, qty);
+                                delete_ingredient_api(user_key, name, qty);
                             } else {
                                 showWarning = 1;
                             }
