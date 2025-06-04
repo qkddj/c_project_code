@@ -58,6 +58,7 @@ int search_recipe_page(SDL_Window* window, SDL_Renderer* renderer) {
                         if (inputLen > 0) {
                             inputBuffer[--inputLen] = '\0';
                             lastInputTime = SDL_GetTicks();
+                            printf("입력됨: %s\n", inputBuffer);
                         }
                     }
                     break;
@@ -67,6 +68,7 @@ int search_recipe_page(SDL_Window* window, SDL_Renderer* renderer) {
                         strcat(inputBuffer, event.text.text);
                         inputLen += strlen(event.text.text);
                         lastInputTime = SDL_GetTicks();
+                        printf("입력됨: %s\n", inputBuffer);
                     }
                     break;
 

@@ -48,6 +48,10 @@ int add_Remove_Ingredients(SDL_Window* window, SDL_Renderer* renderer, const cha
 
                 case SDL_KEYDOWN:
                     if (event.key.keysym.sym == SDLK_ESCAPE) {
+                        if (showingDetail == 0) {
+                            running = 0;
+                            return 1;
+                        }
                         showingDetail = 0;
                         scrollOffset = 0;
                         inputActive = 0;

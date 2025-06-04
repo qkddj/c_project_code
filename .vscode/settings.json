@@ -13,6 +13,8 @@
     "typeinfo": "c",
     "client_func.h": "c",
     "thread": "c",
-    "text_encoding": "c"
+    "text_encoding": "c",
+    "chrono": "c",
+    "functional": "c"
   }
 }
