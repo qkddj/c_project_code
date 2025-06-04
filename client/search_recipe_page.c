@@ -25,6 +25,9 @@ int search_recipe_page(SDL_Window* window, SDL_Renderer* renderer) {
     char suggestions[MAX_SUGGESTIONS][64];
     int suggestCount = 0;
 
+    char lastValidSuggestions[MAX_SUGGESTIONS][64];
+    int lastValidSuggestCount = 0;
+
     Recipe dummy;
 
     Uint32 lastInputTime = 0;
@@ -91,8 +94,16 @@ int search_recipe_page(SDL_Window* window, SDL_Renderer* renderer) {
         if (lastInputTime && SDL_GetTicks() - lastInputTime > debounceDelay) {
             if (strlen(inputBuffer) > 0) {
                 load_recipe_by_name("recipes.csv", inputBuffer, &dummy, suggestions, &suggestCount);
+
+                if (suggestCount > 0) {
+                    lastValidSuggestCount = suggestCount;
+                    for (int i = 0; i < suggestCount; i++) {
+                        strncpy(lastValidSuggestions[i], suggestions[i], 64);
+                    }
+                }
             } else {
                 suggestCount = 0;
+                lastValidSuggestCount = 0;  // <- 모두 지웠을 때 추천어도 제거
             }
             lastInputTime = 0;
         }
@@ -112,17 +123,22 @@ int search_recipe_page(SDL_Window* window, SDL_Renderer* renderer) {
             SDL_DestroyTexture(texture);
         }
 
-        for (int i = 0; i < suggestCount; i++) {
-            SDL_Rect bgRect = {inputRect.x + 10, 230 + i * 40, 330, 35};
-            SDL_SetRenderDrawColor(renderer, 50, 50, 50, 255);
-            SDL_RenderFillRect(renderer, &bgRect);
+        int displayCount = (suggestCount > 0) ? suggestCount : lastValidSuggestCount;
+        char (*displaySuggestions)[64] = (suggestCount > 0) ? suggestions : lastValidSuggestions;
 
-            SDL_Surface* s = TTF_RenderUTF8_Solid(font, suggestions[i], (SDL_Color){255, 255, 255});
-            SDL_Texture* t = SDL_CreateTextureFromSurface(renderer, s);
-            SDL_Rect r = {bgRect.x + 10, bgRect.y + 5, s->w, s->h};
-            SDL_RenderCopy(renderer, t, NULL, &r);
-            SDL_FreeSurface(s);
-            SDL_DestroyTexture(t);
+        if (strlen(inputBuffer) > 0) {
+            for (int i = 0; i < displayCount; i++) {
+                SDL_Rect bgRect = {inputRect.x + 10, 230 + i * 40, 330, 35};
+                SDL_SetRenderDrawColor(renderer, 50, 50, 50, 255);
+                SDL_RenderFillRect(renderer, &bgRect);
+
+                SDL_Surface* s = TTF_RenderUTF8_Solid(font, displaySuggestions[i], (SDL_Color){255, 255, 255});
+                SDL_Texture* t = SDL_CreateTextureFromSurface(renderer, s);
+                SDL_Rect r = {bgRect.x + 10, bgRect.y + 5, s->w, s->h};
+                SDL_RenderCopy(renderer, t, NULL, &r);
+                SDL_FreeSurface(s);
+                SDL_DestroyTexture(t);
+            }
         }
 
         SDL_Surface* labelSurface = TTF_RenderUTF8_Solid(font, "← 메뉴로", (SDL_Color){255, 255, 255});
