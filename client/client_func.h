@@ -35,5 +35,6 @@ void add_ingredient_api(const char* user_key, const char* name, const char* date
 void delete_ingredient_api(const char* user_key, const char* name, int qty);
 int search_recipe_page(SDL_Window* window, SDL_Renderer* renderer);
 int load_recipe_by_name(const char* filename, const char* query, Recipe* result, char suggestions[][64], int* suggestCount);
+int show_recipe_page(SDL_Window* window, SDL_Renderer* renderer, Recipe* recipe);
 
 #endif

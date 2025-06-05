@@ -44,10 +44,16 @@ int search_recipe_page(SDL_Window* window, SDL_Renderer* renderer) {
                     if (event.key.keysym.sym == SDLK_RETURN) {
                         if (strlen(inputBuffer) > 0) {
                             printf("검색어 입력됨: %s\n", inputBuffer);
-                            if (!load_recipe_by_name("recipes.csv", inputBuffer, &dummy, suggestions, &suggestCount)) {
-                                printf("추천어 수: %d\n", suggestCount);
+                            if (load_recipe_by_name("recipes.csv", inputBuffer, &dummy, suggestions, &suggestCount)) {
+                                if (show_recipe_page(window, renderer, &dummy)) {
+                                    SDL_StopTextInput();
+                                    TTF_CloseFont(font);
+                                    running = 0;
+                                    return 7;
+                                }
+
                             } else {
-                                // TODO: 정확히 일치하는 레시피로 이동 구현 예정
+                                printf("추천어 수: %d\n", suggestCount);
                             }
                         }
                     } else if (event.key.keysym.sym == SDLK_ESCAPE) {
