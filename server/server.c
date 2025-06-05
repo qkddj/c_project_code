@@ -17,6 +17,23 @@ int main() {
 
     WSAStartup(MAKEWORD(2, 2), &wsaData); // WinSock 초기화
 
+    char hostname[256];
+    if (gethostname(hostname, sizeof(hostname)) == 0) {
+        struct addrinfo hints = {0}, *res, *p;
+        hints.ai_family = AF_INET;
+        hints.ai_socktype = SOCK_STREAM;
+
+        if (getaddrinfo(hostname, NULL, &hints, &res) == 0) {
+            for (p = res; p != NULL; p = p->ai_next) {
+                struct sockaddr_in* addr = (struct sockaddr_in*)p->ai_addr;
+                char ipstr[INET_ADDRSTRLEN];
+                inet_ntop(AF_INET, &(addr->sin_addr), ipstr, sizeof(ipstr));
+                printf("서버 IP 주소: %s\n", ipstr);
+            }
+            freeaddrinfo(res);
+        }
+    }
+
     server_fd = socket(AF_INET, SOCK_STREAM, 0);
     if (server_fd == INVALID_SOCKET) {
         printf("소켓 생성 실패\n");
