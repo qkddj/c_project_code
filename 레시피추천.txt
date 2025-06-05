@@ -1,0 +1,158 @@
+/*#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
+
+#define MAX_LINE 1024
+#define MAX_RECIPES 100
+#define MAX_INGREDIENTS 20
+#define MAX_NAME 50
+#define MAX_INSTRUCTION 512
+
+// 🧾 구조체 정의
+typedef struct {
+    char name[MAX_NAME];
+    char ingredients[MAX_INGREDIENTS][MAX_NAME];
+    int ingredient_count;
+    char instructions[MAX_INSTRUCTION];  // 조리방법
+} Recipe;
+
+// 🔧 공백 제거 함수
+void trim(char* str) {
+    int start = 0;
+    while (isspace((unsigned char)str[start])) start++;
+
+    int end = strlen(str) - 1;
+    while (end >= start && isspace((unsigned char)str[end])) end--;
+
+    memmove(str, str + start, end - start + 1);
+    str[end - start + 1] = '\0';
+}
+
+int load_recipes(const char* filename, Recipe recipes[]) {
+    FILE* file = fopen(filename, "r");
+    if (!file) {
+        perror("레시피 파일 열기 실패");
+        return 0;
+    }
+
+    char line[MAX_LINE];
+    int count = 0;
+
+    fgets(line, sizeof(line), file); // 헤더 제거
+
+    while (fgets(line, sizeof(line), file)) {
+        trim(line);  // 공백 제거
+        char* token;
+        int i = 0;
+
+        // 첫 번째 토큰: 레시피명
+        token = strtok(line, ",\n");
+        if (!token) continue;
+        trim(token);
+        strncpy(recipes[count].name, token, MAX_NAME);
+
+        char temp[MAX_INGREDIENTS + 1][MAX_NAME];
+
+        // 나머지 토큰: 재료들 + 마지막은 조리법
+        while ((token = strtok(NULL, ",\n")) != NULL && i < MAX_INGREDIENTS + 1) {
+            trim(token);
+            strncpy(temp[i++], token, MAX_NAME);
+        }
+
+        if (i == 0) continue;
+
+        // 마지막은 조리법
+        strncpy(recipes[count].instructions, temp[i - 1], MAX_INSTRUCTION);
+
+        // 나머지는 재료
+        for (int j = 0; j < i - 1; j++) {
+            strncpy(recipes[count].ingredients[j], temp[j], MAX_NAME);
+        }
+
+        recipes[count].ingredient_count = i - 1;
+        count++;
+    }
+
+    fclose(file);
+    return count;
+}
+
+
+// 📂 사용자 재료 파일 로딩
+int load_user_ingredients(const char* filename, char user_ings[][MAX_NAME]) {
+    FILE* file = fopen(filename, "r");
+    if (!file) {
+        perror("재료 파일 열기 실패");
+        return 0;
+    }
+
+    char line[MAX_LINE];
+    int count = 0;
+
+    while (fgets(line, sizeof(line), file)) {
+        line[strcspn(line, "\n\r")] = 0; // 줄바꿈 제거
+        trim(line);
+        strncpy(user_ings[count++], line, MAX_NAME);
+    }
+
+    fclose(file);
+    return count;
+}
+
+// 🧾 재료 존재 여부 검사
+int has_ingredient(const char* item, char user_ings[][MAX_NAME], int user_count) {
+    for (int i = 0; i < user_count; i++) {
+        if (strcmp(item, user_ings[i]) == 0) return 1;
+    }
+    return 0;
+}
+
+// 🍳 레시피 추천 출력
+void recommend_recipes(Recipe recipes[], int recipe_count, char user_ings[][MAX_NAME], int user_count) {
+    printf("🍳 만들 수 있는 레시피 추천:\n");
+
+    int found = 0;
+
+    for (int i = 0; i < recipe_count; i++) {
+        int all_match = 1;
+
+        for (int j = 0; j < recipes[i].ingredient_count; j++) {
+            if (!has_ingredient(recipes[i].ingredients[j], user_ings, user_count)) {
+                all_match = 0;
+                break;
+            }
+        }
+
+        if (all_match) {
+            printf("\n== %s ==\n", recipes[i].name);
+
+            printf("재료: ");
+            for (int k = 0; k < recipes[i].ingredient_count; k++) {
+                printf("%s", recipes[i].ingredients[k]);
+                if (k < recipes[i].ingredient_count - 1) printf(", ");
+            }
+            printf("\n");
+
+            printf("조리방법: %s\n", recipes[i].instructions);
+            found = 1;
+        }
+    }
+
+    if (!found) {
+        printf("\n😥 현재 가진 재료로 만들 수 있는 레시피가 없습니다.\n");
+    }
+}
+
+int main() {
+
+    Recipe recipes[MAX_RECIPES];
+    char user_ings[100][MAX_NAME];
+
+    int recipe_count = load_recipes("recipes.csv", recipes);
+    int user_count = load_user_ingredients("ingredients.csv", user_ings);
+
+    recommend_recipes(recipes, recipe_count, user_ings, user_count);
+
+    return 0;
+}*/
