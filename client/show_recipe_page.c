@@ -6,7 +6,7 @@
 #include "client_func.h"
 
 #define SCROLL_SPEED 30
-#define MAX_CHARS_PER_LINE 30  // 문자 수 기준으로 자르기
+#define MAX_CHARS_PER_LINE 29  // 문자 수 기준으로 자르기
 
 // UTF-8 문자 단위로 줄바꿈 처리
 int utf8_safe_split(const char* input, int maxChars, char lines[][512], int maxLines) {
@@ -43,7 +43,7 @@ int show_recipe_page(SDL_Window* window, SDL_Renderer* renderer, Recipe* recipe)
     // 이미지 로드
     SDL_Texture* recipeImage = NULL;
     char imagePath[128];
-    snprintf(imagePath, sizeof(imagePath), "%s.png", recipe->name);
+    snprintf(imagePath, sizeof(imagePath), "image/%s.png", recipe->name);
     SDL_Surface* imageSurface = IMG_Load(imagePath);
     if (imageSurface) {
         recipeImage = SDL_CreateTextureFromSurface(renderer, imageSurface);
