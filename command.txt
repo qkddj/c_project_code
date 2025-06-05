@@ -3,4 +3,4 @@ gcc server.c csv_open.c -o server -lws2_32
 
 
 
-gcc _main.c login_page.c api.c encoding.c menu_page.c ingredient_page.c sum_ingredients.c add_Remove_Ingredients.c search_recipe_page.c load_recipe_by_name.c show_recipe_page.c keyword_input_page.c show_recommendations.c -o client -I"C:/msys64/mingw64/include/SDL2" -I"C:/msys64/mingw64/include" -Dmain=SDL_main -L"C:/msys64/mingw64/lib" -lmingw32 -lSDL2main -lSDL2 -lSDL2_ttf -lws2_32 -lssl -lcrypto  
+gcc _main.c login_page.c api.c encoding.c menu_page.c ingredient_page.c sum_ingredients.c add_Remove_Ingredients.c search_recipe_page.c load_recipe_by_name.c show_recipe_page.c keyword_input_page.c show_recommendations.c -o client -I"C:/msys64/mingw64/include/SDL2" -I"C:/msys64/mingw64/include" -Dmain=SDL_main -L"C:/msys64/mingw64/lib" -lmingw32 -lSDL2main -lSDL2 -lSDL2_ttf -lSDL2_image -lws2_32 -lssl -lcrypto

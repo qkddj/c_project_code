@@ -1,5 +1,6 @@
 #include <SDL.h>
 #include <SDL_ttf.h>
+#include <SDL_image.h>
 #include <stdio.h>
 #include <string.h>
 #include "client_func.h"
@@ -39,6 +40,18 @@ int show_recipe_page(SDL_Window* window, SDL_Renderer* renderer, Recipe* recipe)
         return -1;
     }
 
+    // 이미지 로드
+    SDL_Texture* recipeImage = NULL;
+    char imagePath[128];
+    snprintf(imagePath, sizeof(imagePath), "%s.png", recipe->name);
+    SDL_Surface* imageSurface = IMG_Load(imagePath);
+    if (imageSurface) {
+        recipeImage = SDL_CreateTextureFromSurface(renderer, imageSurface);
+        SDL_FreeSurface(imageSurface);
+    } else {
+        printf("이미지 로딩 실패 또는 없음: %s\n", imagePath);
+    }
+
     SDL_Event event;
     int running = 1;
     int scrollOffset = 0;
@@ -75,16 +88,33 @@ int show_recipe_page(SDL_Window* window, SDL_Renderer* renderer, Recipe* recipe)
         SDL_RenderClear(renderer);
 
         int y = 50 + scrollOffset;
+
         renderText(renderer, font, recipe->name, 50, y, NULL);
         y += 50;
 
         renderText(renderer, font, "[재료]", 50, y, NULL);
         y += 35;
+
+        int ingredientStartY = y;
+        int ingredientHeight = recipe->ingCount * 30;
+
+        // 재료 텍스트 출력
         for (int i = 0; i < recipe->ingCount; i++) {
             renderText(renderer, font, recipe->ingredients[i], 70, y, NULL);
             y += 30;
         }
-        y += 20;
+
+        // 이미지 출력 (재료 오른쪽)
+        if (recipeImage) {
+            SDL_Rect imgRect = {
+                330,               // 이미지 X 위치 (재료 텍스트 오른쪽)
+                ingredientStartY - 30,  // Y 위치는 재료와 같게 시작
+                250, 250           // 고정 크기
+            };
+            SDL_RenderCopy(renderer, recipeImage, NULL, &imgRect);
+        }
+
+        y = ingredientStartY + (ingredientHeight > 150 ? ingredientHeight : 150) + 20;
 
         renderText(renderer, font, "[조리 절차]", 50, y, NULL);
         y += 35;
@@ -98,7 +128,7 @@ int show_recipe_page(SDL_Window* window, SDL_Renderer* renderer, Recipe* recipe)
                 renderText(renderer, font, stepLines[j], 70, y, NULL);
                 y += 30;
             }
-            y += 10;  // ✅ 단계 간 여백 추가
+            y += 10;
         }
 
         y += 20;
@@ -123,6 +153,7 @@ int show_recipe_page(SDL_Window* window, SDL_Renderer* renderer, Recipe* recipe)
         SDL_Delay(16);
     }
 
+    if (recipeImage) SDL_DestroyTexture(recipeImage);
     TTF_CloseFont(font);
     return 0;
 }
