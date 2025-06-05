@@ -36,5 +36,7 @@ void delete_ingredient_api(const char* user_key, const char* name, int qty);
 int search_recipe_page(SDL_Window* window, SDL_Renderer* renderer);
 int load_recipe_by_name(const char* filename, const char* query, Recipe* result, char suggestions[][64], int* suggestCount);
 int show_recipe_page(SDL_Window* window, SDL_Renderer* renderer, Recipe* recipe);
+int keyword_input_screen(SDL_Window* window, SDL_Renderer* renderer, const char* user_key);
+int show_recommendations(SDL_Window* window, SDL_Renderer* renderer, const char* keyword, const char* user_key);
 
 #endif

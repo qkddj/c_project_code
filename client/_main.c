@@ -71,6 +71,11 @@ int main(int argc, char* argv[]) {
                 page = search_recipe_page(window, renderer);
                 break;
             }
+            case 5: {
+                // 요리 추천 키워드 입력 + 결과 출력
+                page = keyword_input_screen(window, renderer, user_key);
+                break;
+            }
             case 6: {
                 page = 0;
                 break;
@@ -79,7 +84,6 @@ int main(int argc, char* argv[]) {
                 running = 0;
                 break;
             }
-
         }
     }
 
