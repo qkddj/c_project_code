@@ -93,7 +93,7 @@ int keyword_input_screen(SDL_Window* window, SDL_Renderer* renderer, const char*
         SDL_FreeSurface(labelSurface);
         SDL_DestroyTexture(labelTexture);
 
-        renderText(renderer, font, "추천받고 싶은 키워드를 입력하세요", 85, 100, NULL);
+        renderText(renderer, font, "추천받고 싶은 키워드를 입력하세요", 120, 100, NULL);
 
         SDL_RenderPresent(renderer);
     }
