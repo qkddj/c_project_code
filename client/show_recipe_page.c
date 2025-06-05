@@ -71,7 +71,7 @@ int show_recipe_page(SDL_Window* window, SDL_Renderer* renderer, Recipe* recipe)
 
         if (scrollOffset > 0) scrollOffset = 0;
 
-        SDL_SetRenderDrawColor(renderer, 40, 40, 40, 255);
+        SDL_SetRenderDrawColor(renderer, 30, 30, 30, 255);
         SDL_RenderClear(renderer);
 
         int y = 50 + scrollOffset;
