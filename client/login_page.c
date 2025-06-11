@@ -2,19 +2,23 @@
 #include <string.h>
 #include <stdio.h>
 #include "client_func.h"
+#include <windows.h>
 
 #define MAX_INPUT 20
 
+// 로그인 화면을 실행하고 로그인 성공 시 사용자 키를 반환하는 함수
 char* runLoginScreen(SDL_Window* window, SDL_Renderer* renderer) {
+    // 폰트 로딩
     TTF_Font* font = TTF_OpenFont("NanumGothic.ttf", 24);
     if (!font) {
         printf("폰트 로딩 실패: %s\n", TTF_GetError());
         return NULL;
     }
 
+    // 사용자 입력 저장용 버퍼 초기화
     char id_input[MAX_INPUT] = "";
     char pw_input[MAX_INPUT] = "";
-    int input_focus = 0;
+    int input_focus = 0;  // 0: ID, 1: PW 입력창
     int running = 1;
 
     SDL_StartTextInput();
@@ -24,12 +28,18 @@ char* runLoginScreen(SDL_Window* window, SDL_Renderer* renderer) {
         while (SDL_PollEvent(&e)) {
             if (e.type == SDL_QUIT) running = 0;
 
+            // 마우스 클릭 또는 키보드 입력 처리
             if (e.type == SDL_MOUSEBUTTONDOWN || e.type == SDL_KEYDOWN) {
                 int x = e.button.x, y = e.button.y;
+                // ID 입력창 클릭
                 if (x >= 150 && x <= 500 && y >= 150 && y <= 190) input_focus = 0;
+                // PW 입력창 클릭
                 else if (x >= 150 && x <= 500 && y >= 210 && y <= 250) input_focus = 1;
+                // TAB 키로 포커스 전환
                 else if (e.key.keysym.sym == SDLK_TAB) input_focus = (input_focus == 0) ? 1 : 0;
+                // 회원가입 버튼 클릭
                 else if (x >= 150 && x <= 320 && y >= 290 && y <= 330) send_idpw('1', id_input, pw_input);
+                // 로그인 버튼 클릭 또는 엔터 키
                 else if ((x >= 330 && x <= 500 && y >= 290 && y <= 330) || e.key.keysym.sym == SDLK_RETURN) {
                     char* user_key = send_idpw('0', id_input, pw_input);
                     if (strcmp(user_key, "0") != 0) {
@@ -41,6 +51,7 @@ char* runLoginScreen(SDL_Window* window, SDL_Renderer* renderer) {
                 }
             }
 
+            // 텍스트 입력 처리
             if (e.type == SDL_TEXTINPUT) {
                 char* target = (input_focus == 0) ? id_input : pw_input;
                 if (strlen(target) + strlen(e.text.text) < MAX_INPUT - 1)
@@ -48,6 +59,7 @@ char* runLoginScreen(SDL_Window* window, SDL_Renderer* renderer) {
                 printf("입력됨: %s\n", target);
             }
 
+            // 백스페이스 처리
             if (e.type == SDL_KEYDOWN && e.key.keysym.sym == SDLK_BACKSPACE) {
                 char* target = (input_focus == 0) ? id_input : pw_input;
                 size_t len = strlen(target);
@@ -56,9 +68,16 @@ char* runLoginScreen(SDL_Window* window, SDL_Renderer* renderer) {
             }
         }
 
+        // 렌더링 시작 시간 측정
+        LARGE_INTEGER frequency, start, end;
+        QueryPerformanceFrequency(&frequency);
+        QueryPerformanceCounter(&start);
+
+        // 배경색 렌더링
         SDL_SetRenderDrawColor(renderer, 30, 30, 30, 255);
         SDL_RenderClear(renderer);
 
+        // 제목 렌더링
         SDL_Color color = {255, 255, 255};
         SDL_Surface* surface = TTF_RenderUTF8_Blended(font, "로그인", color);
         SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
@@ -67,11 +86,13 @@ char* runLoginScreen(SDL_Window* window, SDL_Renderer* renderer) {
         SDL_FreeSurface(surface);
         SDL_DestroyTexture(texture);
 
+        // 입력창과 버튼 영역
         SDL_Rect id_box = {150, 150, 350, 40};
         SDL_Rect pw_box = {150, 210, 350, 40};
         SDL_Rect sign_up = {150, 290, 170, 40};
         SDL_Rect login_btn = {330, 290, 170, 40};
 
+        // 입력창 테두리 렌더링
         SDL_SetRenderDrawColor(renderer, input_focus == 0 ? 0 : 255, input_focus == 0 ? 150 : 255, 255, 255);
         SDL_RenderDrawRect(renderer, &id_box);
         SDL_SetRenderDrawColor(renderer, input_focus == 1 ? 0 : 255, input_focus == 1 ? 150 : 255, 255, 255);
@@ -80,6 +101,7 @@ char* runLoginScreen(SDL_Window* window, SDL_Renderer* renderer) {
         SDL_RenderDrawRect(renderer, &sign_up);
         SDL_RenderDrawRect(renderer, &login_btn);
 
+        // ID 텍스트 렌더링
         SDL_Surface* id_surf = TTF_RenderUTF8_Blended(font, id_input, color);
         if (id_surf) {
             SDL_Texture* id_tex = SDL_CreateTextureFromSurface(renderer, id_surf);
@@ -89,6 +111,7 @@ char* runLoginScreen(SDL_Window* window, SDL_Renderer* renderer) {
             SDL_DestroyTexture(id_tex);
         }
 
+        // PW 입력 마스킹 처리
         char pw_mask[MAX_INPUT] = "";
         for (int i = 0; i < strlen(pw_input); i++) pw_mask[i] = '*';
 
@@ -101,6 +124,7 @@ char* runLoginScreen(SDL_Window* window, SDL_Renderer* renderer) {
             SDL_DestroyTexture(pw_tex);
         }
 
+        // 로그인 버튼 텍스트 렌더링
         SDL_Surface* btn_surf = TTF_RenderUTF8_Blended(font, "로그인", color);
         SDL_Texture* btn_tex = SDL_CreateTextureFromSurface(renderer, btn_surf);
         SDL_Rect btn_rect = {login_btn.x + 50, login_btn.y + 5, btn_surf->w, btn_surf->h};
@@ -108,6 +132,7 @@ char* runLoginScreen(SDL_Window* window, SDL_Renderer* renderer) {
         SDL_FreeSurface(btn_surf);
         SDL_DestroyTexture(btn_tex);
 
+        // 회원가입 버튼 텍스트 렌더링
         SDL_Surface* sign_surf = TTF_RenderUTF8_Blended(font, "회원가입", color);
         SDL_Texture* sign_tex = SDL_CreateTextureFromSurface(renderer, sign_surf);
         SDL_Rect sign_rect = {sign_up.x + 40, sign_up.y + 5, sign_surf->w, sign_surf->h};
@@ -116,7 +141,13 @@ char* runLoginScreen(SDL_Window* window, SDL_Renderer* renderer) {
         SDL_DestroyTexture(sign_tex);
 
         SDL_RenderPresent(renderer);
-        SDL_Delay(16);
+
+        SDL_Delay(16); // 대략 60fps 유지
+
+        // 프레임 시간 측정 및 출력
+        QueryPerformanceCounter(&end);
+        double elapsedTime = (double)(end.QuadPart - start.QuadPart) / frequency.QuadPart;
+        printf("프레임 시간: %.3f초\n", elapsedTime);
     }
 
     SDL_StopTextInput();

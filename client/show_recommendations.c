@@ -8,17 +8,18 @@
 
 #define MAX_RECOMMEND 50
 
+// 키워드 기반 추천 화면 함수
 int show_recommendations(SDL_Window* window, SDL_Renderer* renderer, const char* keyword, const char* user_key) {
     printf("키워드 입력됨: %s\n", keyword);
 
-    // 레시피 전체 불러오기 (이름만 추출)
+    // CSV 파일에서 레시피 이름들만 불러오기
     FILE* file = fopen("recipes.csv", "r");
     if (!file) return 0;
 
     Recipe recipes[MAX_RECOMMEND];
     int recipeCount = 0;
-
     char line[MAX_LINE_LEN];
+
     while (fgets(line, sizeof(line), file) && recipeCount < MAX_RECOMMEND) {
         line[strcspn(line, "\r\n")] = '\0';
         char* token = strtok(line, ",");
@@ -28,16 +29,17 @@ int show_recommendations(SDL_Window* window, SDL_Renderer* renderer, const char*
     }
     fclose(file);
 
-    // 사용자 식재료 불러오기 및 병합
+    // 사용자의 냉장고 속 재료 불러오기
     int rawCount = 0;
     char** ingredients_raw = get_Ingredients_split('2', user_key, &rawCount);
 
-    // 필터링된 추천 리스트
+    // 최종 추천 리스트 저장용
     Recipe matched[MAX_RECOMMEND];
     int matchedCount = 0;
 
     printf("🔍 키워드와 일치하는 레시피 목록:\n");
 
+    // 모든 레시피 순회하며 필터링
     for (int i = 0; i < recipeCount; i++) {
         Recipe temp;
         char dummy[64][64];
@@ -45,7 +47,7 @@ int show_recommendations(SDL_Window* window, SDL_Renderer* renderer, const char*
 
         if (!load_recipe_by_name("recipes.csv", recipes[i].name, &temp, dummy, &dummyCount)) continue;
 
-        // 키워드와 일치하는지 확인
+        // 키워드 필터: 키워드 중 하나라도 입력된 키워드를 포함하면 통과
         int found = 0;
         for (int k = 0; k < temp.keywordCount; k++) {
             if (strstr(temp.keywords[k], keyword)) {
@@ -57,18 +59,19 @@ int show_recommendations(SDL_Window* window, SDL_Renderer* renderer, const char*
 
         printf("- %s\n", temp.name);
 
-        // 재료 보유 여부 확인
+        // 재료 필터: 모든 재료가 사용자 냉장고에 있는지 확인
         int canMake = 1;
         for (int j = 0; j < temp.ingCount; j++) {
             int hasIng = 0;
 
-            // "계란 1개" → "계란"
+            // "당근 1개" → "당근" 으로 변환
             char temp_ing_name[64];
             strncpy(temp_ing_name, temp.ingredients[j], sizeof(temp_ing_name));
             temp_ing_name[sizeof(temp_ing_name) - 1] = '\0';
             char* unit_ptr = strrchr(temp_ing_name, ' ');
             if (unit_ptr != NULL) *unit_ptr = '\0';
 
+            // 사용자 보유 재료와 비교
             for (int u = 0; u < rawCount; u++) {
                 char user_ing_name[64];
                 strncpy(user_ing_name, ingredients_raw[u], sizeof(user_ing_name));
@@ -87,20 +90,21 @@ int show_recommendations(SDL_Window* window, SDL_Renderer* renderer, const char*
             }
         }
 
+        // 모든 조건 만족하면 추천 후보에 추가
         if (canMake && matchedCount < MAX_RECOMMEND) {
             matched[matchedCount++] = temp;
         }
     }
 
+    // 재료 리스트 메모리 해제
     for (int i = 0; i < rawCount; i++) free(ingredients_raw[i]);
     free(ingredients_raw);
 
-    // 하나 랜덤으로 골라 바로 레시피 화면으로 이동
+    // 추천된 레시피가 있을 경우 하나 랜덤으로 선택하여 바로 표시
     if (matchedCount > 0) {
         srand((unsigned int)time(NULL));
         int randIndex = rand() % matchedCount;
 
-        // 선택된 레시피 이름을 다시 불러와서 show_recipe_page로 전달
         Recipe selected;
         char dummy[64][64];
         int dummyCount;
@@ -109,7 +113,7 @@ int show_recommendations(SDL_Window* window, SDL_Renderer* renderer, const char*
         }
     }
 
-    // 추천 레시피가 없는 경우 SDL 텍스트만 출력
+    // 추천된 레시피가 없을 경우 안내 메시지 출력 화면
     TTF_Font* font = TTF_OpenFont("NanumGothic.ttf", 28);
     if (!font) return 0;
 
@@ -124,6 +128,7 @@ int show_recommendations(SDL_Window* window, SDL_Renderer* renderer, const char*
             else if (event.type == SDL_MOUSEBUTTONDOWN) {
                 int mx = event.button.x;
                 int my = event.button.y;
+                // ← 메뉴로 버튼 클릭 시 종료
                 if (mx >= backButtonRect.x && mx <= backButtonRect.x + backButtonRect.w &&
                     my >= backButtonRect.y && my <= backButtonRect.y + backButtonRect.h) {
                     return 0;
@@ -131,11 +136,14 @@ int show_recommendations(SDL_Window* window, SDL_Renderer* renderer, const char*
             }
         }
 
+        // 배경 초기화
         SDL_SetRenderDrawColor(renderer, 30, 30, 30, 255);
         SDL_RenderClear(renderer);
 
+        // 안내 메시지 출력
         renderText(renderer, font, "추천 가능한 레시피가 없습니다.", 50, 30, NULL);
         renderText(renderer, font, "← 메뉴로", 480, 20, &backButtonRect);
+
         SDL_RenderPresent(renderer);
     }
 
