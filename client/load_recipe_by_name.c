@@ -84,3 +84,37 @@ int load_recipe_by_name(const char* filename, const char* query, Recipe* result,
     fclose(file);
     return 0; // 일치하는 레시피를 찾지 못함
 }
+
+
+
+
+
+/*레시피 확인 -> 사용자에게 요리 이름 입력 받기 -> 입력받은 값과 일치하는 요리가 있는가? yes -> 요리 레시피 띄우기, no-> 관련 검색어 띄우기
+char Input_Cooking_Name[15]
+
+input(“%s”,&Input_Cooking_Name); 사용자가 입력한 요리 이름을 문자열로 저장하는 기능
+
+for (int i = 0; i < ingredient_count; i++) {
+   if (strcmp(keywords[i], Input_Cooking_Name) == 0){
+        cooking = i;
+        break;
+    }   
+}// 레시피를 찾기  입력한 요리 이름(Input_Cooking_Name)과 keywords 배열 안 단어들을 하나씩 비교해서 같으면 해당 인덱스(cooking)를 저장하고 반복을 멈추는 기능이야.
+즉, 요리 레시피 번호를 찾는 코드야.
+
+for (int i = 0; i < keyword_count; i++) {
+    if (strncmp(keywords[i], input, strlen(input)) == 0) {
+        printf(" - %s\n", keywords[i]);
+        count++;
+        if (count >= 10) break;
+    }
+}//관련 검색어를 출력// 입력한 문자열 input과 keywords 배열의 각 단어를처음부터 input 길이만큼만 비교해서 같은 단어를 찾고,
+최대 10개까지 관련 검색어를 출력하는 기능이야.
+
+
+
+
+
+
+
+*/

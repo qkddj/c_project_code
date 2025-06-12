@@ -153,3 +153,90 @@ char* runLoginScreen(SDL_Window* window, SDL_Renderer* renderer) {
     SDL_StopTextInput();
     TTF_CloseFont(font);
 }
+
+
+
+
+
+
+// 시작-> 사용자로부터 아이디,비번 입력받기 1-1 회원가입 선택 -> 사용자가 입력한 아이디,비번 서버에 전송-> 전송 받은 아이디 비번 저장
+//                                          2-1 로그인 선택 -> 사용자가 입력한 아이디,비번 서버에 전송-> 아이디와 비번 있는가? -> 없으면 1-1로 있으면 서버에서
+//인식키 전송 -> 메인화면으로 전송
+/*시작 및 로그인 
+char id_input[20]
+char pw_input[20] 
+input(“%s”,&id_input);
+input(“%s”,&pw_input);이건 로그인 기능에 입력 부분
+
+//
+input(“%s”,&id_input);
+input(“%s”,&pw_input);
+#include <SDL.h>
+#include <SDL_ttf.h>
+#include <string.h>
+#include <stdio.h>
+#include <winsock2.h>
+#include <ws2tcpip.h>
+
+
+CreatLoginWindow() 이건 로그인 화면을  띄우는 함수
+
+if (e.type == SDL_MOUSEBUTTONDOWN || e.type == SDL_KEYDOWN) {
+   int x = e.button.x, y = e.button.y;
+   if (x==로그인 위치 && y==로그인 위치){
+      struct login { // 아이디와 패스워드를 구조체에 저장
+       char id = id_input;
+       char pw = pw_input;
+   }; //마우스 위치를 SDL의 이벤트를 이용해 파악하여 클릭한 것을 파악 
+      send_data(login); 비밀번호를 해시로 암호화 하여 전송  이코드는 로그인 버튼을 클릭하면,
+입력한 아이디(ID)와 비밀번호(PW)를 구조체에 담아 서버로 전송하는 역할을 해.
+
+input() 받기
+if (e.type == SDL_TEXTINPUT) {
+    char* target = input_data;
+    if (strlen(target) + strlen(e.text.text) < MAX_INPUT - 1) {
+        strcat(target, e.text.text);
+        printf("입력됨: %s\n", target);
+    }
+} // SDL의 이벤트를 이용해 입력 값 받기   위에 함수는 사용자가 키보드에 입력한 텍스트를 저장하는 역활
+
+send_Data()
+#define MAX_PAYLOAD 1024
+int send_data(data) {
+    char buf[MAX_PAYLOAD];
+    memset(data, 0, sizeof(input));
+    memset(buf, 0, sizeof(buf));
+    strcpy(&buf[LWS_PRE], data); // buf에 데이터 삽입
+    lws_write(wsi, (unsigned char *)&buf[LWS_PRE], strlen(input), LWS_WRITE_TEXT); 
+    // 데이터 전송
+    break;
+} 소켓 통신을 통해 데이터를 전송 위에 함수는 입력된 데이터를 소켓을 통해 서버에 전송
+
+//Search(login);
+{
+ char id = id_input;
+ char pw = pw_input;}
+// 순차탐색 알고리즘
+으로 사용자 데이터 찾기
+
+//if (e.type == SDL_MOUSEBUTTONDOWN || e.type == SDL_KEYDOWN) {
+   int x = e.button.x, y = e.button.y;
+   if (x==회원가입 위치 && y==회원가입 위치){
+      struct sign_up {
+       char id = id_input;
+       char pw = pw_input;
+   }; //마우스 위치를 SDL의 이벤트를 이용해 파악하여 클릭한 것을 파악 
+      send_data(sign_up); //해시로 비밀번호를 암호화 후 서버에 전송 이건 회원가입 버튼 클릭 시 동작하는 로직 쉽게 말해 회원가입 요청 처리 
+
+//char *id = strtok(line, ",");
+char *pw = strtok(NULL, ",");
+char *user_key = strtok(NULL, ",");
+
+struct Member members[1000];
+memberCount = len(Member members);
+
+int new_sign_up(){
+     strcpy(members[memberCount]. User_IDid, sign_up.id);
+     strcpy(members[memberCount]. User_PWpw, sign_up.pw)
+     memberCount++;
+} //전송 받은 아이디와 비밀번호를 구조체로 서버에 저장  이건 회원가입한 정보를 서버에 저장해주는 기능
